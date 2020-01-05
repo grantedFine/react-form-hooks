@@ -1,0 +1,36 @@
+{
+  "name": "react-form-hooks",
+  "version": "0.0.1",
+  "description": "React hooks for rc-form.",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "module": "es/index.js",
+  "scripts": {
+    "build": "shx rm -rf lib && shx rm -rf lib-es && tsc --pretty -p ./tsconfig.build.json && tsc --pretty -p ./tsconfig.build.es.json",
+    "test": "jest --config=jest.json"
+  },
+  "files": [
+    "lib",
+    "es"
+  ],
+  "peerDependencies": {
+    "react": ">=16.8"
+  },
+  "dependencies": {
+    "async-validator": "^3.2.3"
+  },
+  "devDependencies": {
+    "@testing-library/react-hooks": "^3.2.1",
+    "@types/jest": "^24.0.25",
+    "@types/react": "^16.9.17",
+    "jest": "^24.0.25",
+    "prettier": "^1.11.1",
+    "react": "^16.9.0",
+    "react-test-renderer": "^16.12.0",
+    "rimraf": "^2.6.2",
+    "ts-jest": "^23.10.4",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.15.0",
+    "typescript": "^3.6.2"
+  }
+}
