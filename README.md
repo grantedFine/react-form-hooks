@@ -1,9 +1,13 @@
 # react-form-hook
+### Hooks for rc-form like component. Support two-way data flow.
 
-## Hooks for rc-form like component. Support for two-way data flow.
-
+## begin to use
 ```js
-import  { useForm } from 'react-form-hook'
+  npm install react-hooks-for-form
+```
+## Example
+```js
+import  { useForm } from 'react-hooks-for-form'
 c
 const {
   getFieldDecorator,

@@ -117,6 +117,55 @@ export interface GetFieldDecoratorOptions<T> {
   valuePropName?: string
 }
 
+interface ValidateFieldsOptions {
+  /** 所有表单域是否在第一个校验规则失败后停止继续校验 */
+  // first?: boolean;
+  /** 指定哪些表单域在第一个校验规则失败后停止继续校验 */
+  // firstFields?: string[];
+  /** 已经校验过的表单域，在 validateTrigger 再次被触发时是否再次校验 */
+  force?: boolean;
+  /** 定义 validateFieldsAndScroll 的滚动行为 */
+  // scroll?: DomScrollIntoViewConfig;
+}
+
+export interface FormMethods<T> {
+  errors: FieldsErrors<T>;
+  values: FieldsErrors<T>;
+  validateFields: (
+    ns?: (keyof T)[],
+    options?: ValidateFieldsOptions,
+  ) => Promise<T>;
+  resetFields: (ns?: (keyof T)[]) => void;
+  getFieldDecorator: <P extends React.InputHTMLAttributes<React.ReactElement<P>>>(
+    name: keyof T,
+    options?: GetFieldDecoratorOptions<T[keyof T]>,
+  ) => (element: React.ReactElement<P>) => React.ReactElement<P>;
+  setFieldsValue: (
+    values: {
+      [N in keyof T]?: T[N];
+    },
+  ) => void;
+  setFieldsValueAndDispatchChanges: (
+    values: {
+      [N in keyof T]?: T[N];
+    },
+  ) => void;
+  getFieldsValue: (ns?: (keyof T)[]) => Partial<T>;
+  getFieldValue: (name: keyof T) => T[keyof T] | undefined;
+  setFields: (
+    fields: {
+      [N in keyof T]: {
+        value?: T[N];
+        errors?: Error[];
+      };
+    },
+  ) => void;
+
+  isFieldTouched(name: keyof T): boolean;
+
+  isFieldsTouched(names?: (keyof T)[]): boolean;
+}
+
 function objFilter<T>(obj: { [N in keyof T]?: any }, ns?: (keyof T)[]) {
   if (ns) {
     (Object.keys(obj) as (keyof T)[]).forEach(name => {
@@ -129,7 +178,7 @@ function objFilter<T>(obj: { [N in keyof T]?: any }, ns?: (keyof T)[]) {
 }
 
 
-export function useForm<T = any>(createOptions: CreateOptions<T> = {}) {
+export function useForm<T = any>(createOptions: CreateOptions<T> = {}): FormMethods<T> {
   const cacheData = useRef<{
     fieldsTouched: {
       /**
@@ -154,10 +203,7 @@ export function useForm<T = any>(createOptions: CreateOptions<T> = {}) {
   }>({} as any)
 
   useEffect(() => {
-    valuesRef.current = {
-      ...valuesRef.current,
-      ...values,
-    }
+    valuesRef.current = values
   }, [values])
 
   useEffect(() => {
@@ -218,7 +264,7 @@ export function useForm<T = any>(createOptions: CreateOptions<T> = {}) {
           )
         }
       },
-      'data-__field': { errors: errorsRef.current[name] },
+      'data-__field': { errors: errors[name] },
       'data-__meta': {
         validate: [
           {
@@ -228,10 +274,9 @@ export function useForm<T = any>(createOptions: CreateOptions<T> = {}) {
       },
     }
 
-    props[valuePropName] = valuesRef.current[name]
-
+    props[valuePropName] = values[name]
     return props
-  }, [valuesRef, errorsRef, cacheData, createOptions.onValuesChange, fieldsOptionsRef])
+  }, [values, errors, cacheData, createOptions.onValuesChange, fieldsOptionsRef])
 
   const getFieldDecorator = useCallback(
     (
@@ -263,7 +308,7 @@ export function useForm<T = any>(createOptions: CreateOptions<T> = {}) {
         } as any)
       }
     },
-    [valuesRef, errorsRef, cacheData, createOptions.onValuesChange, fieldsOptionsRef],
+    [values, errors, cacheData, createOptions.onValuesChange, fieldsOptionsRef],
   )
 
 
